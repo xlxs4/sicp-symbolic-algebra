@@ -63,11 +63,14 @@
 
   ;; representation of terms and term lists
   (define (adjoin-term term term-list)
-    (if (zero? (coeff term)) ;; switch to generic =zero?
-        term-list
-        (cons term term-list)))
+    (cond ((=zero? (coeff term)) term-list)
+          ((= (order term) (length term-list))
+           (cons (coeff term) term-list))
+          (else
+           (adjoin-term term (cons 0 term-list)))))
   (define (the-empty-termlist) '())
-  (define (first-term term-list) (car term-list))
+  (define (first-term term-list) (make-term (- (length term-list) 1)
+                                            (car term-list)))
   (define (rest-terms term-list) (cdr term-list))
   (define (empty-termlist? term-list)
     (null? term-list))
@@ -109,5 +112,7 @@
   (put 'make 'polynomial
        (lambda (var terms)
          (tag (make-poly var terms))))
+  (put '=zero? 'polynomial
+       empty-termlist?)
 
   'done)
